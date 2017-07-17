@@ -33,12 +33,10 @@
     headers:
       x-api-key: "{{ jumpcloud_api_key | mandatory }}"
     method: PUT
-    url: "{{ jumpcloud_tags_endpoint }}/{{ jumpcloud_tag_name }}"
+    url: "{{ jumpcloud_tags_endpoint }}/{{ item }}"
     body_format: json
     body:
-      name: "{{ jumpcloud_tag_name }}"
+      name: "{{ item }}"
       systems: "{{ systemID }}"
-  # TODO
-  # with_items for NAMES (Let's say we want to add multiple servers to multiple groups than we can use with_items to add a set of systems to groups)
-  # with_items for SYSTEMS [Array] - add multiple servers to a group
+    with_items: "{{ jumpcloud_tags }}"
   when: jumpcloud_bind_to_system is defined

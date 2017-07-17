@@ -4,3 +4,4 @@ jumpcloud_api_endpoint: "https://console.jumpcloud.com/api"
 jumpcloud_systems_endpoint: "{{ jumpcloud_api_endpoint }}/systems"
 jumpcloud_tags_endpoint: "{{ jumpcloud_api_endpoint }}/tags"
 jumpcloud_config_file: /opt/jc/jcagent.conf
+jumpcloud_tags: ['group1', 'group2', 'group3']
