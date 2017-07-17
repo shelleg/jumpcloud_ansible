@@ -1,0 +1,4 @@
+---
+# defaults file for jumpcloudAgent
+ntpPool: il.pool.ntp.org
+jcagentHome: /opt/jc

@@ -1,0 +1,44 @@
+---
+
+- name: Get system ID
+  set_fact:
+    systemID: "{{ (lookup('file', jumpcloud_config_file) | from_json).get('systemKey') }}"
+
+- name: Remove system {{ ansible_hostname }}
+  uri:
+    headers:
+      x-api-key: "{{ jumpcloud_api_key | mandatory }}"
+    method: DELETE
+    url: "{{ jumpcloud_systems_endpoint }}/{{ systemID }}"
+  when: jumpcloud_delete_system is defined
+
+- name: Update system {{ ansible_hostname }}
+  uri:
+    headers:
+      x-api-key: "{{ jumpcloud_api_key | mandatory }}"
+    method: PUT
+    url: "{{ jumpcloud_systems_endpoint }}/{{ systemID }}"
+    body_format: json
+    body:
+      tags:
+      displayName: "{{ displayName | default(ansible_hostname) }}"
+      allowPublicKeyAuthentication: "{{ publicKeyauth | default('true') }}"
+      allowSshPasswordAuthentication: "{{ sshPassauth | default('true') }}"
+      allowSshRootLogin: "{{ sshRootlogin | default('true') }}"
+      allowMultiFactorAuthentication: "{{ mulitFactorauth | default('false') }}"
+  when: jumpcloud_update_system is defined
+
+- name: Bind Tag to system
+  uri:
+    headers:
+      x-api-key: "{{ jumpcloud_api_key | mandatory }}"
+    method: PUT
+    url: "{{ jumpcloud_tags_endpoint }}/{{ jumpcloud_tag_name }}"
+    body_format: json
+    body:
+      name: "{{ jumpcloud_tag_name }}"
+      systems: "{{ systemID }}"
+  # TODO
+  # with_items for NAMES (Let's say we want to add multiple servers to multiple groups than we can use with_items to add a set of systems to groups)
+  # with_items for SYSTEMS [Array] - add multiple servers to a group
+  when: jumpcloud_bind_to_system is defined

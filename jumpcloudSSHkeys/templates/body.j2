@@ -1,0 +1,31 @@
+{"ssh_keys":
+  [
+  {% if jumpcloud_user.json.results.0.ssh_keys|length > 0 %}
+  {% for key in jumpcloud_user.json.results.0.ssh_keys %}
+    {
+    "ssh_key_name": "{{ key.name }}",
+    "ssh_public_key": "{{ key.public_key }}",
+    },
+  {% endfor %}
+    {
+    "ssh_key_name": "{{ ssh_key_name }}",
+    "ssh_public_key": "{{ ssh_public_key }}",
+    }
+  {% endif %}
+  ]
+}
+
+
+
+
+
+
+--------------
+- name: Add user's SSH key to JumpCloud
+  uri:
+    headers:
+      x-api-key: "{{ jumpcloud_api_key | mandatory }}"
+    method: PUT
+    url: "{{ jumpcloud_systemusers_endpoint }}/{{ jumpcloud_user.json.results.0._id }}"
+    body_format: json
+    body: "{{ lookup('template','body.j2') }}"

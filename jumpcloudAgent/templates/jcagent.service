@@ -1,0 +1,19 @@
+[Unit]
+Description=JumpCloud Agent
+After=network.target
+After=syslog.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+PIDFile=/var/run/jcagent.pid
+ExecStart={{ jcagentHome }}/bin/jcagent start
+ExecReload={{ jcagentHome }}/bin/jcagent restart
+ExecStop={{ jcagentHome }}/bin/jcagent stop
+RemainAfterExit=yes
+TimeoutStopSec=0
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

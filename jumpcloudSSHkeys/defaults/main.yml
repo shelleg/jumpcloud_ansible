@@ -1,0 +1,5 @@
+---
+# defaults file for jumpcloudSSHkeys
+jumpcloud_api_endpoint: "https://console.jumpcloud.com/api"
+jumpcloud_systemusers_endpoint: "{{ jumpcloud_api_endpoint }}/systemusers"
+jumpcloud_searchusers_endpoint: "{{ jumpcloud_api_endpoint }}/search/systemusers"

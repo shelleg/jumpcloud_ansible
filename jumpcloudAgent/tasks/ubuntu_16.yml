@@ -1,0 +1,42 @@
+---
+
+  - name: Install curl
+    apt:
+      name: curl
+      state: present
+
+  - name: Check JumpCloud agent installation
+    command: dpkg-query -l jcagent
+    register: jumpcloud_installed
+    ignore_errors: True
+
+  - name: Download JumpCloud Kickstart script
+    uri:
+      url: https://kickstart.jumpcloud.com/Kickstart
+      method: GET
+      return_content: no
+      headers:
+        x-connect-key: "{{ jumpcloud_xconnect_key | mandatory }}"
+      dest: "{{ ansible_env.HOME}}"
+    when: jumpcloud_installed.stdout == ""
+    register: script
+
+  - name: Make the script executable
+    file:
+      path: "{{ script.path }}"
+      mode: "u+x"
+    when: jumpcloud_installed.stdout == ""
+
+  - name: Run JumpCloud's Kickstart
+    shell: "{{ script.path }}"
+    args:
+      executable: /bin/bash
+    when: jumpcloud_installed.stdout == ""
+    register: jumpcloud_kickstart
+
+  - name: Check JumpCloud Service
+    systemd:
+      daemon_reload: yes
+      state: started
+      name: jcagent
+      enabled: yes
