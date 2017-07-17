@@ -1,1 +1,27 @@
-# Placeholder file for MacOSX JC Agent Installation
+---
+
+  - name: Download JumpCloud package
+    get_url:
+      url: https://s3.amazonaws.com/jumpcloud-windows-agent/production/jumpcloud-agent.pkg
+      headers:
+        x-connect-key: "{{ jumpcloud_xconnect_key | mandatory }}"
+      dest: "{{ ansible_env.HOME}}"
+    register: jumpcloud_pkg
+    ignore_errors: true
+
+  - name: Create JumpCloud Agent directory
+    file:
+      path: /opt/jc
+      state: directory
+    register: jumpcloud_agent_directory
+    become: true
+
+  - name: Prepare agentBootstrap.json
+    template:
+      src: agentBootstrap.json
+      dest: "{{ jumpcloud_agent_directory.path }}/agentBootstrap.json"
+    become: true
+
+  - name: Install JumpCloud Agent
+    command: installer -pkg "{{ jumpcloud_pkg.dest }}" -target /
+    become: true
