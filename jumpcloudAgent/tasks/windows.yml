@@ -1,0 +1,30 @@
+---
+
+  - name: Install prequesites
+    win_chocolatey:
+      name: vcredist2013
+      state: present
+
+  - name: Get JumpCloud agent
+    win_rui:
+      headers:
+        x-connect-key: "{{ jumpcloud_xconnect_key | mandatory }}"
+      method: GET
+      url: https://s3.amazonaws.com/jumpcloud-windows-agent/production/JumpCloudInstaller.exe
+      dest: "{{ ansible_env.HOME}}"
+
+  - name: Run JumpCloud agent installation
+    win_shell: JumpCloudInstaller.exe -k "{{ jumpcloud_xconnect_key | mandatory }}" /VERYSILENT /NORESTART /SUPPRESSMSGBOXES
+    args:
+      executable: cmd
+
+  - name: Insure JumpCloud agent service is configured
+    win_service:
+      name: jumpcloud-agent
+      start_mode: auto
+      state: started
+
+  - name: Reboot "{{ inventory_hostname }}"
+    win_reboot:
+      msg: Reboot initiated by Ansbile after JumpCloud Installation
+      pre_boot_delay_sec: 600
