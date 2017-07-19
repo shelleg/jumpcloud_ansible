@@ -25,15 +25,13 @@
 - set_fact:
     ssh_public_key: "{{ lookup('file', jumpcloud_username + '_rsa.pub' )}}"
     ssh_key_name: "{{ jumpcloud_username }}_public_key"
+    ssh_endpoint: "{{ jumpcloud_systemusers_endpoint }}/{{ jumpcloud_user.json.results.0._id }}/sshkeys"
 
-- name: Add user's SSH key to JumpCloud
+- name: Append user's SSH key to JumpCloud
   uri:
     headers:
       x-api-key: "{{ jumpcloud_api_key | mandatory }}"
-    method: PUT
-    url: "{{ jumpcloud_systemusers_endpoint }}/{{ jumpcloud_user.json.results.0._id }}"
+    method: POST
+    url: "{{ ssh_endpoint }}"
     body_format: json
-    body:
-      ssh_keys:
-        public_key: "{{ ssh_public_key }}"
-        name: "{{ ssh_key_name }}"
+    body: "{{ lookup('template','body.j2') }}"
