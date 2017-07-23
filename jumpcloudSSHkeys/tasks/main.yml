@@ -24,6 +24,7 @@
 
 - set_fact:
     ssh_public_key: "{{ lookup('file', jumpcloud_username + '_rsa.pub' )}}"
+    ssh_private_key: "{{ lookup('file', jumpcloud_username + '_rsa' )}}"
     ssh_key_name: "{{ jumpcloud_username }}_public_key"
     ssh_endpoint: "{{ jumpcloud_systemusers_endpoint }}/{{ jumpcloud_user.json.results.0._id }}/sshkeys"
 
@@ -35,3 +36,16 @@
     url: "{{ ssh_endpoint }}"
     body_format: json
     body: "{{ lookup('template','body.j2') }}"
+
+- name: Check Vault status
+  hashivault_status:
+  register: vault_status
+  when: vault is defined
+
+- name: Write SSH key to Vault
+  hashivault_write:
+    secret: "{{ vault_path }}/{{ jumpcloud_username }}"
+    data:
+      private_key: "{{ ssh_private_key }}"
+      public_key: "{{ ssh_public_key }}"
+  when: vault is defined
