@@ -38,14 +38,23 @@
     body: "{{ lookup('template','body.j2') }}"
 
 - name: Check Vault status
-  hashivault_status:
+  uri:
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    method: GET
+    url: "{{ vault_health_endpoint }}"
+    status_code: 200
   register: vault_status
   when: vault is defined
 
 - name: Write SSH key to Vault
-  hashivault_write:
-    secret: "{{ vault_path }}/{{ jumpcloud_username }}"
-    data:
+  uri:
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    method: POST
+    url: "{{ vault_ssh_endpoint }}"
+    body_format: json
+    body:
       private_key: "{{ ssh_private_key }}"
       public_key: "{{ ssh_public_key }}"
-  when: vault is defined
+  when: vault is defined and vault_status.status == "200"

@@ -1,10 +1,13 @@
 ---
 # defaults file for jumpcloudSSHkeys
+jumpcloud_api_key: "jumpcloudapikey"
 jumpcloud_api_endpoint: "https://console.jumpcloud.com/api"
 jumpcloud_systemusers_endpoint: "{{ jumpcloud_api_endpoint }}/systemusers"
 jumpcloud_searchusers_endpoint: "{{ jumpcloud_api_endpoint }}/search/systemusers"
+jumpcloud_username: "myusername"
 domain: "@mydomain.com"
-vault_path: "/secret/sshkeys"
 vault_address: "http://myvault:8200"
+vault_health_endpoint: "{{ vault_address }}/v1/sys/health"
+vault_ssh_endpoint: "{{ vault_address }}/v1/ssh/keys"
 vault_token: "my-vault-token"
 vault: "true"
