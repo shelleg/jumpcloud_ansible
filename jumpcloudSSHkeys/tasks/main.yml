@@ -44,7 +44,7 @@
     method: GET
     url: "{{ vault_health_endpoint }}"
     status_code: 200
-  register: vault_status
+  register: vaultStatus
   when: vault is defined
 
 - name: Write SSH key to Vault
@@ -52,9 +52,9 @@
     headers:
       X-Vault-Token: "{{ vault_token }}"
     method: POST
-    url: "{{ vault_ssh_endpoint }}"
+    url: "{{ vault_ssh_endpoint }}/{{ jumpcloud_username }}"
     body_format: json
     body:
       private_key: "{{ ssh_private_key }}"
       public_key: "{{ ssh_public_key }}"
-  when: vault is defined and vault_status.status == "200"
+  when: vault is defined and vaultStatus.status == 200
