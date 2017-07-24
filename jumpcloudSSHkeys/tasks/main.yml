@@ -21,6 +21,8 @@
 
 - name: Generate SSH keys for {{ jumpcloud_username }}
   command: ssh-keygen -q -t rsa -b 4096 -C "{{ jumpcloud_username }}{{ domain }}" -f "{{ jumpcloud_username }}_rsa" -N ""
+  args:
+    chdir: "{{ ansible_env.HOME }}"
 
 - set_fact:
     ssh_public_key: "{{ lookup('file', jumpcloud_username + '_rsa.pub' )}}"
@@ -51,10 +53,12 @@
   uri:
     headers:
       X-Vault-Token: "{{ vault_token }}"
+      Content-Type: 'application/json'
     method: POST
-    url: "{{ vault_ssh_endpoint }}/{{ jumpcloud_username }}"
+    url: "{{ vault_secret_endpoint }}/{{ jumpcloud_username }}"
     body_format: json
     body:
       private_key: "{{ ssh_private_key }}"
       public_key: "{{ ssh_public_key }}"
+    status_code: "200,204"
   when: vault is defined and vaultStatus.status == 200
