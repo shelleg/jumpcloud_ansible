@@ -22,7 +22,7 @@
 - name: Generate SSH keys for {{ jumpcloud_username }}
   command: ssh-keygen -q -t rsa -b 4096 -C "{{ jumpcloud_username }}{{ domain }}" -f "{{ jumpcloud_username }}_rsa" -N ""
   args:
-    chdir: "{{ ansible_env.HOME }}"
+    chdir: "{{ ansible_env.HOME }}/sshkeys"
 
 - set_fact:
     ssh_public_key: "{{ lookup('file', jumpcloud_username + '_rsa.pub' )}}"

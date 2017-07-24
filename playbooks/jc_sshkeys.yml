@@ -1,5 +1,7 @@
 ---
 
 - hosts: localhost
+  vars_files:
+    - "{{ ansible_env.HOME }}/jumpcloud_ansible/vars/jc_ssh_vars.yml"
   roles:
     - jumpcloudSSHKeys
