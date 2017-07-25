@@ -11,9 +11,16 @@
       filter: [username: "{{ jumpcloud_username }}"]
   register: jumpcloud_user
 
+- file:
+    path: "{{ ansible_env.HOME }}/sshkeys"
+    state: directory
+
+- set_fact:
+    ssh_directory: "{{ ansible_env.HOME }}/sshkeys"
+
 - name: Remove existing SSH Key "{{ jumpcloud_username }}_rsa" if found
   file:
-    path: "{{ item }}"
+    path: "{{ssh_directory}}/{{ item }}"
     state: absent
   with_items:
     - "{{ jumpcloud_username }}_rsa"
@@ -22,12 +29,14 @@
 - name: Generate SSH keys for {{ jumpcloud_username }}
   command: ssh-keygen -q -t rsa -b 4096 -C "{{ jumpcloud_username }}{{ domain }}" -f "{{ jumpcloud_username }}_rsa" -N ""
   args:
-    chdir: "{{ ansible_env.HOME }}/sshkeys"
+    chdir: "{{ ssh_directory }}"
 
 - set_fact:
-    ssh_public_key: "{{ lookup('file', jumpcloud_username + '_rsa.pub' )}}"
-    ssh_private_key: "{{ lookup('file', jumpcloud_username + '_rsa' )}}"
-    ssh_key_name: "{{ jumpcloud_username }}_public_key"
+    ssh_private: "{{ ssh_directory }}/{{ jumpcloud_username }}_rsa"
+    ssh_public: "{{ ssh_directory }}/{{ jumpcloud_username }}_rsa.pub"
+- set_fact:
+    ssh_private_key: "{{ lookup('file', ssh_private )}}"
+    ssh_public_key: "{{ lookup('file', ssh_public )}}"
     ssh_endpoint: "{{ jumpcloud_systemusers_endpoint }}/{{ jumpcloud_user.json.results.0._id }}/sshkeys"
 
 - name: Append user's SSH key to JumpCloud
@@ -46,8 +55,8 @@
     method: GET
     url: "{{ vault_health_endpoint }}"
     status_code: 200
-  register: vaultStatus
-  when: vault is defined
+    register: vaultStatus
+    when: vault is defined
 
 - name: Write SSH key to Vault
   uri:
@@ -61,4 +70,3 @@
       private_key: "{{ ssh_private_key }}"
       public_key: "{{ ssh_public_key }}"
     status_code: "200,204"
-  when: vault is defined and vaultStatus.status == 200
