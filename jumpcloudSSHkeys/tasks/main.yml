@@ -18,7 +18,7 @@
 - set_fact:
     ssh_directory: "{{ ansible_env.HOME }}/sshkeys"
 
-- name: Remove existing SSH Key "{{ jumpcloud_username }}_rsa" if found
+- name: Remove SSH Keys from local stoarge for "{{ jumpcloud_username }}"
   file:
     path: "{{ssh_directory}}/{{ item }}"
     state: absent
@@ -70,3 +70,11 @@
       private_key: "{{ ssh_private_key }}"
       public_key: "{{ ssh_public_key }}"
     status_code: "200,204"
+
+- name: Remove SSH keys from local storage for "{{ jumpcloud_username }}"
+  file:
+    path: "{{ssh_directory}}/{{ item }}"
+    state: absent
+  with_items:
+    - "{{ jumpcloud_username }}_rsa"
+    - "{{ jumpcloud_username }}_rsa.pub"
