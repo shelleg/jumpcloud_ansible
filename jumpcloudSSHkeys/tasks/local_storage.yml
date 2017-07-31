@@ -1,0 +1,15 @@
+---
+- file:
+    path: "{{ ansible_env.HOME }}/sshkeys"
+    state: directory
+
+- set_fact:
+    ssh_directory: "{{ ansible_env.HOME }}/sshkeys"
+
+- name: Remove SSH Keys from local stoarge for "{{ jumpcloud_username }}"
+  file:
+    path: "{{ ssh_directory }}/{{ item }}"
+    state: absent
+  with_items:
+    - "{{ jumpcloud_username }}_rsa"
+    - "{{ jumpcloud_username }}_rsa.pub"

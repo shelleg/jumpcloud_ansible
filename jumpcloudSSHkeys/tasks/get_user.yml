@@ -1,0 +1,12 @@
+---
+
+- name: Get user id by username
+  uri:
+    headers:
+      x-api-key: "{{ jumpcloud_api_key | mandatory }}"
+    method: POST
+    url: "{{ jumpcloud_searchusers_endpoint }}"
+    body_format: json
+    body:
+      filter: [username: "{{ jumpcloud_username }}"]
+  register: jumpcloud_user

@@ -1,0 +1,9 @@
+---
+- name: Append user's SSH key to JumpCloud
+  uri:
+    headers:
+      x-api-key: "{{ jumpcloud_api_key | mandatory }}"
+    method: POST
+    url: "{{ ssh_endpoint }}"
+    body_format: json
+    body: "{{ lookup('template','body.j2') }}"

@@ -1,0 +1,22 @@
+---
+- name: Check Vault status
+  uri:
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    method: GET
+    url: "{{ vault_health_endpoint }}"
+    status_code: 200
+    register: vaultStatus
+
+- name: Write SSH key to Vault
+  uri:
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+      Content-Type: 'application/json'
+    method: POST
+    url: "{{ vault_secret_endpoint }}/{{ jumpcloud_username }}"
+    body_format: json
+    body:
+      private_key: "{{ ssh_private_key }}"
+      public_key: "{{ ssh_public_key }}"
+    status_code: "200,204"

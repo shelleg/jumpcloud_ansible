@@ -1,0 +1,14 @@
+---
+- name: Generate SSH keys for {{ jumpcloud_username }}
+  command: ssh-keygen -q -t rsa -b 4096 -C "{{ jumpcloud_username }}{{ domain }}" -f "{{ jumpcloud_username }}_rsa" -N ""
+  args:
+    chdir: "{{ ssh_directory }}"
+
+- set_fact:
+    ssh_private: "{{ ssh_directory }}/{{ jumpcloud_username }}_rsa"
+    ssh_public: "{{ ssh_directory }}/{{ jumpcloud_username }}_rsa.pub"
+
+- set_fact:
+    ssh_private_key: "{{ lookup('file', ssh_private )}}"
+    ssh_public_key: "{{ lookup('file', ssh_public )}}"
+    ssh_endpoint: "{{ jumpcloud_systemusers_endpoint }}/{{ jumpcloud_user.json.results.0._id }}/sshkeys"
