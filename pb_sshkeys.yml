@@ -1,0 +1,7 @@
+---
+
+- hosts: localhost
+  vars_files:
+    - "vars/jc_ssh_vars.yml"
+  roles:
+    - jumpcloudSSHkeys

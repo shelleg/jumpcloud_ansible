@@ -1,11 +1,19 @@
 ---
-- set_fact:
-    ssh_key_id: {{ jumpcloud_user.json.results.0.ssh_keys.0.id }}
-    when: ssh_key_id is undefined
+- name: Remove an SSH Keys from JumpCloud
+  uri:
+    headers:
+      x-api-key: "{{ jumpcloud_api_key | mandatory }}"
+    method: DELETE
+    url: "{{ ssh_endpoint }}/{{ item._id }}"
+  ignore_errors: yes
+  with_items: "{{ jumpcloud_user.json.results | map(attribute='ssh_keys') | list }}"
+  when: delete_all_keys is defined
 
-- name: Remove an SSH Key from JumpCloud
+- name: Remove an SSH Keys from JumpCloud
   uri:
     headers:
       x-api-key: "{{ jumpcloud_api_key | mandatory }}"
     method: DELETE
     url: "{{ ssh_endpoint }}/{{ ssh_key_id }}"
+  ignore_errors: yes
+  when: delete_all_keys is undefined and ssh_key_id is defined

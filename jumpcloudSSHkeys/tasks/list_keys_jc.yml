@@ -1,0 +1,6 @@
+---
+- name: List SSH keys
+  debug:
+    msg: "{{ item }}"
+  with_items: "{{ jumpcloud_user.json.results | map(attribute='ssh_keys') | list }}"
+  when: list is defined

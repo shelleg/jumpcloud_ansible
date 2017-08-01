@@ -3,6 +3,9 @@
 - name: Get User by ID
   include: get_user.yml
 
+- name: Set global facts
+  include: facts.yml
+
 - name: Prepare local storage
   include: local_storage.yml
   when: delete_key is undefined
